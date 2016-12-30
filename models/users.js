@@ -21,6 +21,36 @@ var UserSchema = mongoose.Schema({
   },
   profileimage:{
     type: String
+  },
+  progress: {
+    tier1: {
+      ydkjs: {
+        upAndGoing: {
+          chp1: {
+            started: {
+              type: Boolean,
+              default: false
+            },
+            completed: {
+              type: Boolean,
+              default: false
+            },
+            startDate: {
+              type: Date
+            }
+          }
+        }
+      }
+    },
+    tier2: {
+
+    },
+    tier3: {
+
+    },
+    tier4: {
+
+    }
   }
 });
 

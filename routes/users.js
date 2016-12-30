@@ -14,40 +14,41 @@ router.get('/', function(req, res, next) {
 
 // Register
 router.get('/register', function(req, res, next) {
-  res.render('register', {title: 'Register'});
+  res.render('register',{title:'Register'});
 });
 
-router.post('/register', upload.single('profileimage'), function(req, res, next) {
+router.post('/register', upload.single('profileimage') ,function(req, res, next) {
   var name = req.body.name;
   var email = req.body.email;
   var username = req.body.username;
   var password = req.body.password;
   var password2 = req.body.password2;
 
-  if(req.file) {
-    console.log('Uploading File....');
-    var profileimage = req.file.filename;
+  if(req.file){
+  	console.log('Uploading File...');
+  	var profileimage = req.file.filename;
   } else {
-    console.log('No File Uploaded...');
-    var profileimage = 'noimage.jpg';
+  	console.log('No File Uploaded...');
+  	var profileimage = 'noimage.jpg';
   }
 
   // Form Validator
-  req.checkBody('name', 'Name field is required').notEmpty();
-  req.checkBody('email', 'Email field is required').notEmpty();
-  req.checkBody('email', 'Email is not valid!').isEmail();
-  req.checkBody('username', 'Username field is required').notEmpty();
-  req.checkBody('password', 'Password field is required').notEmpty();
-  req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
+  req.checkBody('name','Name field is required').notEmpty();
+  req.checkBody('email','Email field is required').notEmpty();
+  req.checkBody('email','Email is not valid').isEmail();
+  req.checkBody('username','Username field is required').notEmpty();
+  req.checkBody('password','Password field is required').notEmpty();
+  req.checkBody('password2','Passwords do not match').equals(req.body.password);
 
+  // Check Errors
   var errors = req.validationErrors();
 
-  if (errors) {
-    res.render('register', {
-      errors: errors
-    });
-  } else {
-    var newUser = new User({
+  if(errors){
+  	res.render('register', {
+  		errors: errors
+  	});
+  } else{
+  	var newUser = new User({
       name: name,
       email: email,
       username: username,
@@ -56,13 +57,10 @@ router.post('/register', upload.single('profileimage'), function(req, res, next)
     });
 
     User.createUser(newUser, function(err, user){
-      if(err){
-        throw err;
-      }
-      console.log(user);
+      if(err) throw err;
     });
 
-    req.flash('success', 'You are now registered and can login!');
+    req.flash('success', 'You are now registered and can login');
 
     res.location('/');
     res.redirect('/');
@@ -71,22 +69,29 @@ router.post('/register', upload.single('profileimage'), function(req, res, next)
 
 // Login
 router.get('/login', function(req, res, next) {
-  res.render('login', {title: 'Login'});
+  if(req.user){
+    req.logout();
+    req.flash('success', 'You are now logged out');
+    res.redirect('/');
+  } else {
+    res.render('login', {title:'Login/Logout'});
+  }
 });
 
 router.post('/login',
-  passport.authenticate('local', {failureRedirect:'/users/login', failureFlash: 'Invalid username or password'}),
-  function(req, res){
+  passport.authenticate('local',{failureRedirect:'/users/login', failureFlash: 'Invalid username or password'}),
+  function(req, res) {;
+    console.log(req.user)
     req.flash('success', 'You are now logged in');
     res.redirect('/');
 });
 
-passport.serializeUser(function(user, done){
+passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done){
-  User.getUserById(id, function(err, user){
+passport.deserializeUser(function(id, done) {
+  User.getUserById(id, function(err, user) {
     done(err, user);
   });
 });
@@ -103,7 +108,7 @@ passport.use(new LocalStrategy(function(username, password, done){
       if(isMatch){
         return done(null, user);
       } else {
-        return done(null, false, {message: 'Invalid Password'});
+        return done(null, false, {message:'Invalid Password'});
       }
     });
   });

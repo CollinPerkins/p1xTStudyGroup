@@ -13,8 +13,6 @@ nav.navbar.navbar-default
           a(href='/') Home
         li(class=(title == 'Register' ? 'active' : ''))
           a(href='/users/register') Register
-        li(class=(title == 'Login' ? 'active' : ''))
-          a(href='/users/login') Login
       ul.nav.navbar-nav.navbar-right
-        li
-          a(href='/users/logout') Logout
+        li(class=(title == 'Login' ? 'active' : ''))
+          a(href='/users/login') Login/Logout
